@@ -13,8 +13,11 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Moltbot CLI
+        env:
+          CI: true
+          NONINTERACTIVE: 1
         run: |
-          curl -fsSL https://molt.bot/install.sh | bash
+          curl -fsSL https://molt.bot/install.sh | bash -s -- --headless
           # Add to path if needed, though install usually handles it or puts in specific bin
           export PATH=$PATH:$HOME/.moltbot/bin
 
