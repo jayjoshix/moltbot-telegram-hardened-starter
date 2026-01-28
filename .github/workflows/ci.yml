@@ -12,14 +12,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Moltbot CLI
-        env:
-          CI: true
-          NONINTERACTIVE: 1
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: Install Moltbot CLI (via npm)
         run: |
-          curl -fsSL https://molt.bot/install.sh | bash -s -- --headless
-          # Add to path if needed, though install usually handles it or puts in specific bin
-          export PATH=$PATH:$HOME/.moltbot/bin
+          npm install -g clawdbot
+          # Ensure it's in path (setup-node should handle this, but explicit check doesn't hurt)
+          clawdbot --version
+          # Alias moltbot to clawdbot for compatibility with our scripts if needed
+          if ! command -v moltbot &> /dev/null; then
+            sudo ln -s $(which clawdbot) /usr/local/bin/moltbot
+          fi
 
       - name: Syntax Check (bash)
         run: bash -n scripts/*.sh
