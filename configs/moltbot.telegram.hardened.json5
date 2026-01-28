@@ -1,0 +1,41 @@
+// Moltbot Hardened Telegram Configuration
+//
+// secure-by-default:
+// - Pairing required for DMs (no open access)
+// - Groups disabled
+// - Browser tool disabled
+// - Configuration writes disabled
+//
+// Setup:
+// 1. Set TELEGRAM_BOT_TOKEN and MOLTBOT_GATEWAY_TOKEN in your environment or .env file.
+// 2. Run `moltbot gateway` (or usage scripts/run.sh).
+// 3. To pair: `moltbot pairing list telegram` then `moltbot pairing approve telegram <CODE>`.
+{
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      // "token": "${TELEGRAM_BOT_TOKEN}", // Deprecated key; automatically picked up from TELEGRAM_BOT_TOKEN env var
+      "dmPolicy": "pairing", // Requires manual approval: `moltbot pairing approve telegram <CODE>`
+      "groupPolicy": "disabled", // Groups strictly disabled by default
+      "configWrites": false // Bot cannot update its own config via chat
+    }
+  },
+  "gateway": {
+    // "enabled", "bindAddress" are defaults/deprecated in newer versions.
+    // "mode": "local" locks it to loopback.
+    "mode": "local", 
+    "auth": {
+      "token": "${MOLTBOT_GATEWAY_TOKEN}"
+    }
+  },
+  "tools": {
+    // Browser tool, etc disabled by default if omitted.
+  },
+  "commands": {
+    "config": false, // Disable config modification commands
+    "bash": false,   // Disable shell execution commands
+    "restart": false,
+    "debug": false
+  }
+  // logging.redactSensitive is default/deprecated
+}

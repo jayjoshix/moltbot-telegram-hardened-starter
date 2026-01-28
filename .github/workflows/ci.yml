@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Moltbot CLI
+        run: |
+          curl -fsSL https://molt.bot/install.sh | bash
+          # Add to path if needed, though install usually handles it or puts in specific bin
+          export PATH=$PATH:$HOME/.moltbot/bin
+
+      - name: Syntax Check (bash)
+        run: bash -n scripts/*.sh
+
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './scripts'
+
+      - name: Secret Scan (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify Config (No Token Mode)
+        # We run health check. It might fail connectivity to Telegram, but should validate schema.
+        run: |
+          ./scripts/bootstrap.sh
+          # Attempt to run verify. It returns exit code of health check.
+          # Since we don't have valid tokens, we expect it might fail "start", but we want to check schema validity.
+          # Moltbot `doctor` is good for static analysis.
+          moltbot doctor
